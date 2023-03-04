@@ -1,0 +1,11 @@
+{
+    "pubkey": "92e48e3c4934c2b74ac151c1128369a33df4686533f50318eb4766a4895bd57ed9c3c14e4a2d92a55bcf7bd1fc9139e4",
+    "withdrawal_credentials": "0017a025aec8ebcdb76913a4378a141408282430ebe58533604df7fc703b8946",
+    "amount": 32000000000,
+    "signature": "b7d6e13498d43bd9b1c4d6f759fcf1c1397a6626dca0c03a97cbe8345e45807f31292255dcfd5df7d1e333deba562bd408bbbb38a44bc201e9e12ce53c769153dffbb1cd7d59a4a40bea454dc49617f85c5f49f83a8bc3bbaae6d04a57b2aeb9",
+    "deposit_message_root": "d80d3072b29db8b53f8190907dccc5aa3bac109da67d99c0994f31846324a974",
+    "deposit_data_root": "5e24800ee2656cc49c507844e5e6706c0cfca4c2312b4d13458851cf09f63b87",
+    "fork_version": "00001020",
+    "network_name": "goerli",
+    "deposit_cli_version": "2.4.0"
+}
