@@ -17,5 +17,4 @@ docs/
 .DS_Store
 
 broadcast
-
-lib
+/lib/
