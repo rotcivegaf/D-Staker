@@ -1,0 +1,19 @@
+{
+  "name": "d-staker",
+  "version": "1.0.0",
+  "description": "A decentralized, permissionless staking service that allows anyone to stake any amount of ether, receive rewards and contribute to the ecosystem health without any restrictions.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "run-rpc": "node initialize_rpc.js && cd fRPC-Substrate/gateway && npm run run configs/config.json"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.3"
+  }
+}
