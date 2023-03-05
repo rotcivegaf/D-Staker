@@ -17,3 +17,6 @@
 	path = lib/chainlink
 	url = https://github.com/smartcontractkit/chainlink
 	branch = v1.12.0
+[submodule "fRPC-Substrate"]
+	path = fRPC-Substrate
+	url = https://github.com/fluencelabs/fRPC-Substrate
