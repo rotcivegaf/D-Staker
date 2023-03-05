@@ -36,6 +36,7 @@ contract StakingPool is Owned, ERC4626 {
     mapping(address => uint256) public userClaims;
     uint256 public totalValidators;
     uint256 public totalEarned;
+    uint256 public totalEarnedHistoric;
 
     IDepositContract public immutable depositContract;
     ISSVNetwork public immutable SSVNetwork;
@@ -80,6 +81,7 @@ contract StakingPool is Owned, ERC4626 {
     receive() external payable {
         if (address(asset) != msg.sender) {
             totalEarned += msg.value;
+            totalEarnedHistoric += msg.value;
         }
     }
 
@@ -264,6 +266,11 @@ contract StakingPool is Owned, ERC4626 {
     function totalEarnedInUSD() external view returns (uint256 amount) {
         (uint256 price, uint256 priceDecimals) = getLatestPrice();
         return (totalEarned * price) / priceDecimals;
+    }
+
+    function totalEarnedHistoricInUSD() external view returns (uint256 amount) {
+        (uint256 price, uint256 priceDecimals) = getLatestPrice();
+        return (totalEarnedHistoric * price) / priceDecimals;
     }
 
     function calcRewards(address who) public view returns (uint256 amount) {

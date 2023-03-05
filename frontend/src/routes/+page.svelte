@@ -25,8 +25,8 @@
 		}
 
 		[totalEarned, totalEarnedInUSD, totalStaked, totalStakedInUSD, totalValidators] = await Promise.all([
-				stakingPoolContract.totalEarned(),
-				stakingPoolContract.totalEarnedInUSD(),
+				stakingPoolContract.totalEarnedHistoric(),
+				stakingPoolContract.totalEarnedHistoricInUSD(),
 				stakingPoolContract.totalSupply(),
 				stakingPoolContract.totalAssetsInUSD(),			
 				stakingPoolContract.totalValidators(),
@@ -49,11 +49,11 @@
 	class="hero min-h-screen"
 	style="background-image: url(/hero.jpg);"
 >
-	<div class="hero-overlay bg-opacity-30" />
+	<div class="hero-overlay bg-opacity-50" />
 	<div class="hero-content text-center text-neutral-content">
 		<div class="max-w-md">
-			<h1 class="mb-5 text-6xl font-bold">D-Staker!</h1>
-			<p class="mb-5">
+			<h1 class="mb-5 text-6xl font-bold text-white">D-Staker!</h1>
+			<p class="mb-5 text-white">
 				Stake ETH, contribute on Ethereum and earn rewards with low risks!
 			</p>
 			<a class="btn btn-primary" href="/stake">Get Started</a>
@@ -61,7 +61,8 @@
 	</div>
 </div>
 
-<div class="w-full p-10 bg-slate-100">
+<div class="w-full p-10 bg-slate-100 font-mono">
+	<h2 class="text-3xl text-center font-bold">Current stats</h2>
 	<div class="flex flex-row justify-around w-full my-5">
 		<div class="flex flex-col justify-center">
 			<p class="text-2xl font-bold  text-center">

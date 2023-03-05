@@ -1,37 +1,5 @@
 <script lang="ts">
 	import StakeForm from '$lib/StakeForm.svelte';
-	import {signer, address, provider} from "$store/wallet";
-	import {showNotification, NotificationType} from '$store/notifications';
-	import {getStakingPoolContract} from '$utils/contracts';
-	import type { Contract } from 'ethers';
-
-	let stakingContract: Contract | undefined;
-
-	let loading = false;
-	async function load() {
-		loading = true;
-
-		if (!$provider || !$address) {
-			return;
-		}
-		
-		stakingContract = await getStakingPoolContract();
-
-		if (!stakingContract) {
-			showNotification("Invalid Staking Pool Contract", {
-				type: NotificationType.Error
-			});
-			return;
-		}
-	}
-
-	$: if($address) {
-    load();
-  }
-
-	$: if ($signer) {
-		load();
-	}
 </script>
 
 <svelte:head>

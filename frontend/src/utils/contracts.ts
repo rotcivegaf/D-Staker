@@ -1,4 +1,4 @@
-import { STAKING_POOL_ABI } from './abis.js';
+import { STAKING_POOL_ABI, ERC20_ABI } from './abis.js';
 
 import { get } from 'svelte/store';
 
@@ -8,7 +8,15 @@ import { signer, provider } from '../store/wallet';
 const contractsDictionary: Array<Contract> = [];
 const contractsReadOnlyDictionary: Array<Contract> = [];
 
+export async function getWETHContract() {
+	return await getContract(import.meta.env.VITE_WETH_ADDRESS, ERC20_ABI);
+}
+
 export async function getStakingPoolContract() {
+	return await getContract(import.meta.env.VITE_STAKING_POOL_ADDRESS, STAKING_POOL_ABI);
+}
+
+export async function getContract(address: any, abi: any) {
 	const _signer = await get(signer);
 	const _provider = await get(provider);
 
@@ -16,28 +24,18 @@ export async function getStakingPoolContract() {
 		throw new Error('Error');
 	}
 
-	const stakingPoolAddress = import.meta.env.VITE_STAKING_POOL_ADDRESS;
-
 	if (_signer) {
-		if (!contractsDictionary[stakingPoolAddress]) {
-			contractsDictionary[stakingPoolAddress] = new Contract(
-				stakingPoolAddress,
-				STAKING_POOL_ABI,
-				_signer
-			);
+		if (!contractsDictionary[address]) {
+			contractsDictionary[address] = new Contract(address, abi, _signer);
 		}
 
-		return contractsDictionary[stakingPoolAddress];
+		return contractsDictionary[address];
 	}
 
 	if (_provider) {
-		if (!contractsReadOnlyDictionary[stakingPoolAddress]) {
-			contractsReadOnlyDictionary[stakingPoolAddress] = new Contract(
-				stakingPoolAddress,
-				STAKING_POOL_ABI,
-				_provider
-			);
+		if (!contractsReadOnlyDictionary[address]) {
+			contractsReadOnlyDictionary[address] = new Contract(address, abi, _provider);
 		}
-		return contractsReadOnlyDictionary[stakingPoolAddress];
+		return contractsReadOnlyDictionary[address];
 	}
 }

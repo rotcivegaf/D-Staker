@@ -17,6 +17,7 @@ docs/
 .DS_Store
 
 broadcast
+.nyc_output
 
 node_modules
 

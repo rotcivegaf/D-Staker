@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {getStakingPoolContract} from "$utils/contracts";
+	import {getStakingPoolContract, getWETHContract} from "$utils/contracts";
 	import {signer, address, provider} from "$store/wallet";
 	import {showNotification, NotificationType} from "$store/notifications";
 	import {BigNumber, utils, Contract} from 'ethers';
@@ -9,12 +9,42 @@
 
 	let loading = false;
 	let stakingContract: Contract | undefined; 
+	let wethContract: Contract | undefined;
 
 	let symbol: string = '';
 	let totalEarned = BigNumber.from(0);
 	let totalEarnedInUSD = BigNumber.from(0);
 	let totalStaked = BigNumber.from(0);
 	let totalStakedInUSD = BigNumber.from(0);
+	let wethAvailable = BigNumber.from(0);
+	let availableForUnstake = BigNumber.from(0);
+
+	$: availableForUnstake = totalStaked.lt(wethAvailable) ? totalStaked : wethAvailable;
+
+	async function loadInitialValues() {
+		if (!stakingContract) {
+			showNotification("Invalid Staking Pool Contract", {
+				type: NotificationType.Error
+			});
+			return;
+		}
+
+		if (!wethContract) {
+			showNotification("Invalid Weth Contract", {
+				type: NotificationType.Error
+			});
+			return;
+		}
+
+		[totalEarned, totalEarnedInUSD, totalStaked, totalStakedInUSD, symbol, wethAvailable] = await Promise.all([ 
+			stakingContract.calcRewards($address), 
+			stakingContract.calcRewardsInUSD($address),
+			stakingContract.stakeOf($address), 
+			stakingContract.stakeOfInUSD($address), 
+			stakingContract.symbol(),
+			wethContract.balanceOf(stakingContract.address), 
+		]);
+	}
 
 	async function load() {
 		loading = true;
@@ -23,22 +53,12 @@
 			return;
 		}
 
-		stakingContract = await getStakingPoolContract();
+		[stakingContract, wethContract] = await Promise.all([
+			getStakingPoolContract(),
+			getWETHContract(),
+		])
 
-		if (!stakingContract) {
-			showNotification("Invalid Staking Pool Contract", {
-				type: NotificationType.Error
-			});
-			return;
-		}
-
-		[totalEarned, totalEarnedInUSD, totalStaked, totalStakedInUSD, symbol] = await Promise.all([
-			stakingContract.calcRewards($address),
-			stakingContract.calcRewardsInUSD($address),
-			stakingContract.stakeOf($address),
-			stakingContract.stakeOfInUSD($address),
-			stakingContract.symbol(),
-		]);
+		await loadInitialValues();
 	}
 
 	let claming = false;
@@ -49,22 +69,36 @@
 			});
 			return;
 		}
+
+		if (!wethContract) {
+			showNotification("Invalid Weth Contract", {
+				type: NotificationType.Error
+			});
+			return;
+		}
+
 		claming = true;
 		try {
-			// const rawTransaction = await stakingContract.populateTransaction.claim();
-			// const successfull = await simulate(rawTransaction);
-			// if (!successfull) {
-			// 	showNotification("The transaction will be reverted. Please, check the values", {
-			// 		type: NotificationType.Error
-			// 	});
-			// 	return;
-			// }
+			const wethAvailable = await wethContract.balanceOf(stakingContract.address);
+
+			const rawTransaction = await stakingContract.populateTransaction.claim();
+			const successfull = await simulate(rawTransaction);
+			if (!successfull) {
+				showNotification("The transaction will be reverted. Please, check the values", {
+					type: NotificationType.Error
+				});
+				return;
+			}
+
 			const tx = await stakingContract.claim();
-			const receipt = await tx.wait();
-			console.log(receipt);
-			showNotification("Success", {
+
+			const { transactionHash } = await tx.wait();
+			
+			showNotification(`Success: Tx: <a href="https://goerli.etherscan.io/tx/${transactionHash}">${transactionHash}</a>`, {
 				type: NotificationType.Check
 			});
+
+			await loadInitialValues();
 		} catch (error) {
 			console.error(error);
 			showNotification(error.message, {
@@ -81,7 +115,7 @@
 		}
 		unstaking = true;
 		try {
-			const rawTransaction = await stakingContract.populateTransaction.unstake(totalStaked);
+			const rawTransaction = await stakingContract.populateTransaction.unstake(availableForUnstake);
 			const successfull = await simulate(rawTransaction);
 			if (!successfull) {
 				showNotification("The transaction will be reverted. Please, check the values", {
@@ -89,12 +123,16 @@
 				});
 				return;
 			}
-			const tx = await stakingContract.unstake(totalStaked);
-			const receipt = await tx.wait();
-			console.log(receipt);
-			showNotification("Success", {
+
+			const tx = await stakingContract.unstake(availableForUnstake);
+			
+			const { transactionHash } = await tx.wait();
+			
+			showNotification(`Success: Tx: <a href="https://goerli.etherscan.io/tx/${transactionHash}">${transactionHash}</a>`, {
 				type: NotificationType.Check
 			});
+
+			await loadInitialValues();
 		} catch (error) {
 			console.error(error);
 			showNotification(error.message, {
@@ -131,12 +169,18 @@
 			<div class="flex flex-col justify-stretch">
 				{#if totalStaked.gt(0)}
 					<h3 class="font-bold text-2xl text-center">{formatEther(totalStaked)} ETH</h3>
+					<h4 
+						class="text-center font-bold"
+						class:text-green-700={availableForUnstake.gt(0)}
+						class:text-red-700={availableForUnstake.eq(0)}
+					>Available: {formatEther(availableForUnstake)} ETH</h4>
 					<h4 class="text-center">${parseFloat(utils.formatEther(totalStakedInUSD)).toFixed(2)} USD</h4>
 					<button 
 						class="btn btn-primary btn-wide mt-5"
-						class:disabled={totalStaked.eq(0)}
+						class:disabled={availableForUnstake.eq(0)}
 						class:loading={unstaking}
-						disabled={totalStaked.eq(0) || unstaking}
+						disabled={availableForUnstake.eq(0) || unstaking}
+						class:cursor-not-allowed={availableForUnstake.eq(0)}
 						on:click={unstake}
 					>{unstaking ? 'Unstaking' : 'Unstake'}</button>
 				{:else}

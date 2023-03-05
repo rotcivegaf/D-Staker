@@ -16,6 +16,8 @@ export const STAKING_POOL_ABI = [
 	'function totalSupply() view returns(uint256)',
 	'function totalValidators() view returns(uint256)',
 	'function totalEarned() view returns (uint256)',
+	'function totalEarnedHistoric() view returns (uint256)',
+	'function totalEarnedHistoricInUSD() view returns (uint256)',
 	'function totalEarnedInUSD() view returns (uint256)',
 	'function totalAssets() view returns (uint256)',
 	'function totalAssetsInUSD() view returns (uint256)',

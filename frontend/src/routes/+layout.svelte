@@ -18,7 +18,7 @@
 
 <Header />
 
-<main class="content flex-1 flex-col text-sm flex justify-center">
+<main class="content flex-1 flex-col text-sm flex justify-center font-mono">
 	<slot />
 </main>
 
