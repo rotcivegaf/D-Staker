@@ -84,9 +84,9 @@ contract StakingPoolTest is Test, StakingDataMock {
 
         assertEq(stakingPool.calcRewards(alice), 0);
 
-        deal(address(stakingPool), 1 ether);
+        payable(address(stakingPool)).call{ value: 1 ether }('');
 
-        assertEq(stakingPool.calcRewards(alice), 0);
+        assertEq(stakingPool.calcRewards(alice), 1 ether);
     }
 
     function testUnstake() external {
