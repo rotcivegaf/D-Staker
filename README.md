@@ -45,7 +45,7 @@ source .env.local && forge test --fork-url $INFURA_RPC_URL -vvv
 ## Local deployment using ganache
 1 - Run ganache in one terminal
 ```sh
-  source .env.local && ganache -f $INFURA_RPC_URL
+  source .env.local && ganache-cli -f $INFURA_RPC_URL
 ```
 
 2 - Deploy the contracts
